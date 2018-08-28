@@ -1,0 +1,24 @@
+$(document).ready(function() {
+    $("#form").submit(function(event) {
+        genConfig ($('input[name=nodenumber]').val(), $('input[name=bgpasn]').val(), $('input[name=ipprefix]').val(), $('input[name=dns]').val());
+    });
+});
+let saveData = (function(){
+    let a = document.createElement("a");
+    //document.body.appendChild(a);
+    a.style = "display: none";
+    return function (data, fileName){
+        let blob = new Blob([data], {type: 
+"octet/stream"}),
+        url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+}());
+    let genConfig = function(nodenumber,bgpasn, ipprefix, dns="10.10.10.10,1.1.1.1"){    
+    let data = ":global ipprefix "+ipprefix+"\r\n:global iptenantsrange "+ipprefix+".5-"+ipprefix+".119\r\n:global iptenantsgw "+ipprefix+".1\r\n:global ippublicrange "+ipprefix+".130-"+ipprefix+".180\r\n:global ippublicgw "+ipprefix+".129\r\n:global dns "+dns+"\r\n\/delay 15\r\n:for j from=1 to=4 step=1 do={\r\n  :for i from=2000 to=50 step=-400 do={\r\n    :beep frequency=$i length=11ms;\r\n    :delay 11ms;\r\n  }\r\n  :for i from=800 to=2000 step=400 do={\r\n    :beep frequency=$i length=11ms;\r\n    :delay 11ms;\r\n  }\r\n}\r\n:foreach x in=[\/interface wireless find] do={ \/interface wireless reset-configuration $x }\r\n:for t from=1200 to=350 step=-50 do={\r\n  :beep frequency=$t length=33ms;\r\n  :delay 33ms;\r\n}\r\n:beep frequency=500 length=100ms\r\n\/ip address add address=192.168.88.1\/24 interface=ether3 network=192.168.88.0\r\n:beep frequency=600 length=100ms\r\n\/interface ethernet\r\nset [ find default-name=ether5 ] poe-out=forced-on\r\n:beep frequency=700 length=100ms\r\n\/interface wireless security-profiles\r\nadd authentication-types=wpa-psk,wpa2-psk management-protection=allowed mode=\\\r\n    dynamic-keys name=nycmeshnet supplicant-identity=nycmesh \\\r\n    wpa-pre-shared-key=nycmeshnet wpa2-pre-shared-key=nycmeshnet\r\n:beep frequency=800 length=100ms\r\n\/interface wireless\r\nset [ find default-name=wlan1 ] band=5ghz-a\/n\/ac channel-width=20\/40\/80mhz-Ceee disabled=no distance=indoors frequency=auto mode=ap-bridge security-profile=nycmeshnet ssid=(\"nycmesh-"+nodenumber+"-omni\")  wireless-protocol=802.11 wps-mode=disabled\r\nadd disabled=no master-interface=wlan1 name=wlan2 ssid=\"-NYC Mesh Community WiFi-\" wps-mode=disabled\r\n:beep frequency=900 length=100ms\r\n\/interface bridge\r\nadd auto-mac=yes name=publicaccess\r\nadd auto-mac=yes name=tenants\r\n:beep frequency=1000 length=100ms\r\n\/ip address\r\nadd address=($ipprefix . \".1\/25\") interface=tenants network=($ipprefix . \".0\")\r\nadd address=($ipprefix . \".129\/26\") interface=publicaccess network=($ipprefix . \".128\")\r\n:beep frequency=1100 length=100ms\r\n\/interface bridge port\r\nadd bridge=tenants interface=ether1\r\nadd bridge=tenants interface=ether2\r\nadd bridge=tenants interface=ether3\r\nadd bridge=tenants interface=ether4\r\nadd bridge=tenants interface=wlan1\r\nadd bridge=publicaccess interface=wlan2\r\n:beep frequency=1200 length=100ms\r\n\/ip pool\r\nadd name=tenants ranges=$iptenantsrange\r\nadd name=publicaccess ranges=$ippublicrange\r\n:beep frequency=1300 length=100ms\r\n\/ip dhcp-server\r\nadd address-pool=tenants disabled=no interface=tenants name=tenantsdhcp\r\nadd address-pool=publicaccess disabled=no interface=publicaccess name=publicaccessdhcp\r\n:beep frequency=1400 length=100ms\r\n\/routing bgp instance\r\nset default as="+bgpasn+" disabled=no\r\n:beep frequency=1500 length=100ms\r\n\/routing bgp network\r\nadd network=($ipprefix . \".0\/24\") synchronize=no\r\n:beep frequency=1600 length=100ms\r\n\/ip dhcp-server network\r\nadd address=($ipprefix . \".0\/25\") dns-server=10.10.10.10 gateway=($ipprefix . \".1\") netmask=25\r\nadd address=($ipprefix . \".128\/26\") dns-server=10.10.10.10 gateway=($ipprefix . \".129\") netmask=25\r\n:beep frequency=1700 length=100ms\r\n\/ip firewall filter\r\nadd action=accept chain=input protocol=icmp\r\nadd action=drop chain=forward in-interface=publicaccess out-interface=tenants\r\nadd action=drop chain=input in-interface=publicaccess\r\nadd action=accept chain=forward\r\nadd action=accept chain=input\r\n:beep frequency=1800 length=100ms\r\n\/system clock set time-zone-name=America\/New_York\r\n\/system identity set name=(\"nycmesh-"+nodenumber+"-omni\")\r\n\/ip address add address=10.70.130.137\/32 interface=ether3 network=10.70.130.136\r\n:beep frequency=500 length=200ms;\r\n:delay 500ms;\r\n:beep frequency=500 length=200ms;\r\n:delay 200ms;\r\n:beep frequency=800 length=500ms;\r\n:delay 50ms;";
+    let fileName = "nycmesh-omni-"+nodenumber+".rsc";
+    saveData(data, fileName);
+    }
