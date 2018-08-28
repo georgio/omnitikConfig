@@ -7,10 +7,10 @@
     <body>
         <h1>NYC Mesh - Omnitik 5 PoE ac Config generator</h1>
     <form name="form" id="form">
-       <li>Node Number:<br><input type="text" name="nodenumber" placeholder="####"></li>
-        <li>ASN:<br><input type="text" name="bgpasn", id="bgpasn" placeholder="######"></li>
-        <li>IP Prefix:<br><input type="text" name="ipprefix" placeholder="&quot;xxx.xxx.xxx&quot;"></li>
-        <li>DNS:<br><input type="text" name="dns" placeholder="x.x.x.x,x.x.x.x"></li>
+       <li>Node Number:<br><input type="text" name="nodenumber" placeholder="####" required></li>
+        <li>ASN:<br><input type="text" name="bgpasn", id="bgpasn" placeholder="######" required></li>
+        <li>IP Prefix:<br><input type="text" name="ipprefix" placeholder="&quot;xxx.xxx.xxx&quot;" required></li>
+        <li>DNS: (optional)<br><input type="text" name="dns" placeholder="x.x.x.x,x.x.x.x"></li>
     </form>
     <button type="submit" form ="form" value="Submit">Submit</button>
     </body>
