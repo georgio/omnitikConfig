@@ -5,7 +5,7 @@ Generates network compatible config file for RBOmniTikPG-5HacD running routeros-
 *Instructions*
 1. Acquire IP prefix, ASN, and Node Number from NYC 
 Mesh admins
-2. Go to georgio.github.io/omnitikConfig
+2. Go to https://georgio.github.io/omnitikConfig
 3. Fill in the data and download the config file
 4. Flash the config
  
